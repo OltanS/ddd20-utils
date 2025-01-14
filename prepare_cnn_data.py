@@ -2,7 +2,7 @@ from __future__ import print_function
 import numpy as np
 import h5py
 import os, sys, time, argparse
-from hdf5_deeplearn_utils import calc_data_mean, calc_data_std, build_train_test_split, check_and_fix_timestamps, resize_data_into_new_key
+from hdf5_deeplearn_utils import calc_data_mean, calc_data_std, build_train_test_split, resize_data_into_new_key
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -19,14 +19,11 @@ if __name__ == '__main__':
     new_size = (args.new_height, args.new_width)
 
     dataset = h5py.File(args.filename, 'a')
-    # print('Checking timestamps...')
-    # check_and_fix_timestamps(dataset)
-
     print('Calculating train/test split...')
     sys.stdout.flush()
     build_train_test_split(dataset, train_div=args.train_length, test_div=args.test_length, force=args.rewrite)
 
-    if np.any(dataset['aps_frame'][0]):
+    if "aps_frame" in dataset:
         new_aps_key = '{}_{}x{}'.format('aps_frame', new_size[0], new_size[1])
         print('Resizing APS frames to {}...'.format(new_aps_key))
         sys.stdout.flush()
@@ -47,7 +44,7 @@ if __name__ == '__main__':
             calc_data_std(dataset, new_aps_key, force=args.rewrite)
             print('Finished in {}s.'.format(time.time()-start_time))
 
-    if np.any(dataset['dvs_frame'][0]):
+    if "dvs_frame" in dataset:
         new_dvs_key = '{}_{}x{}'.format('dvs_frame', new_size[0], new_size[1])
         print('Resizing DVS frames to {}...'.format(new_dvs_key))
         sys.stdout.flush()
