@@ -24,7 +24,7 @@ import ctypes
 from argparse import RawTextHelpFormatter
 import numpy as np
 import h5py
-import cv2
+import cv2  # Ensure OpenCV is installed: pip install opencv-python
 import time
 import multiprocessing as mp
 import queue
@@ -258,7 +258,7 @@ class MergedStream(mp.Process):
     def tmax(self):
         return self.ts_stop['dvs'].value
 
-    def search(self, t, block=True):
+    def search(self, t, block=True):  # 'block' parameter is currently unused
         if self.run_search.is_set():
             return
         self.skip_to.value = np.uint64(t)
@@ -301,17 +301,19 @@ class Viewer(Interface):
     ''' Simple visualizer for events '''
     def __init__(self, max_fps=40, zoom=1, rotate180=False, **kwargs):
         super(Viewer, self).__init__(**kwargs)
+        self.screen_w, self.screen_h = 2560, 1440
+        self.w, self.h = 800, 600
         self.zoom = zoom
-        cv2.namedWindow('frame')
+        cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
+        cv2.resizeWindow('frame', self.w, self.h)
+        cv2.moveWindow('frame', (self.screen_w // 2) - self.w - 10, (self.screen_h // 2) - (self.h // 2))
         # tobi added from https://stackoverflow.com/questions/21810452/
         # cv2-imshow-command-doesnt-work-properly-in-opencv-python/
         # 24172409#24172409
         cv2.startWindowThread()
-        cv2.namedWindow('polarity')
-        ox = 0
-        oy = 0
-        cv2.moveWindow('frame', ox, oy)
-        cv2.moveWindow('polarity', ox + int(448*self.zoom), oy)
+        cv2.namedWindow('polarity', cv2.WINDOW_NORMAL)
+        cv2.resizeWindow('polarity', self.w, self.h)
+        cv2.moveWindow('polarity', (self.screen_w // 2) + 10, (self.screen_h // 2) - (self.h // 2))
         self.set_fps(max_fps)
         self.pol_img = 0.5 * np.ones(DVS_SHAPE)
         self.t_now = 0
@@ -320,7 +322,7 @@ class Viewer(Interface):
         self.cache = {}
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.display_info = True
-        self.display_color = 0
+        self.display_color = 128
         self.playback_speed = 1.  # seems to do nothing
         self.rotate180 = rotate180
         # sets contrast for full scale event count for white/black
@@ -517,8 +519,11 @@ class Viewer(Interface):
 class Controller(Interface):
     def __init__(self, filename, **kwargs):
         super(Controller, self).__init__(**kwargs)
+        self.screen_w, self.screen_h = 2560, 1440
+        self.w, self.h = 800, 600
         cv2.namedWindow('control')
-        cv2.moveWindow('control', 400, 698)
+        cv2.resizeWindow('timeline', 600, 800)
+        cv2.moveWindow('timeline', (self.screen_w // 2) - self.w - 10, (self.screen_h // 2) + (self.h // 2) + 10)
         self.f = h5py.File(filename, 'r')
         self.tmin, self.tmax = self._get_ts()
         self.len = int(self.tmax - self.tmin) + 1
@@ -560,7 +565,7 @@ class Controller(Interface):
             return
         img[offset:offset+height, x] = y
 
-    def _set_search(self, event, x, y, flags, param):
+    def _set_search(self, event, x, _y, _flags, _param):
         if event != cv2.EVENT_LBUTTONDOWN:
             return
         t = self.len * 1e6 * x / float(self.width) + self.tmin * 1e6
