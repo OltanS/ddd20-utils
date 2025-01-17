@@ -7,6 +7,7 @@ idna==2.7
 importlib-resources==3.3.1
 numpy==1.16.6
 opencv-contrib-python==4.2.0.32
+opencv-python==3.4.6.27
 opencv-python-headless==4.2.0.32
 openxc==0.15.0
 pathlib2==2.3.7.post1
