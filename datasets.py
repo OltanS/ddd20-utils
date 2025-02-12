@@ -14,7 +14,7 @@ class HDF5(mp.Process):
     Creates a hdf5 file with datasets of specified types.
     Provides an append method.
     '''
-    def __init__(self, filename='rec.hdf5', tables={}, bufsize=2048*16, chunksize=0, mode='w-', compression=None):
+    def __init__(self, filename='rec.hdf5', tables={}, bufsize=2048*128, chunksize=0, mode='w-', compression=None):
         super(HDF5, self).__init__()
         self.compression = compression
         self.fname = filename
