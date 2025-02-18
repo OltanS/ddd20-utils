@@ -4,6 +4,7 @@ import h5py
 import numpy as np
 import multiprocessing as mp
 import Queue
+import time
 
 SIZE_INC = int(2048)
 CHUNK_SIZE = int(128)
@@ -85,10 +86,13 @@ class HDF5(mp.Process):
             self.outbuffers[tname] = []
 
     def save(self, data):
-        try:
-            self.q.put_nowait(data)
-        except Queue.Full:
-            raise Queue.Full('dataset buffer overflow')
+        while True:
+            try:
+                self.q.put_nowait(data)
+            except Queue.Full:
+                print("Queue full, waiting 5s.")
+                time.sleep(5)
+                
 
     def _save(self, data):
         for col,val in data.iteritems():
