@@ -89,6 +89,7 @@ class HDF5(mp.Process):
         while True:
             try:
                 self.q.put_nowait(data)
+                break
             except Queue.Full:
                 print("Queue full, waiting 5s.")
                 time.sleep(5)
