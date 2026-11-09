@@ -1,5 +1,7 @@
 # DDD20 End-to-End Event Camera Driving Dataset
 
+> Fork of [SensorsINI/ddd20-utils](https://github.com/SensorsINI/ddd20-utils) with updated requirements and export fixes. Used as a submodule by [event-camera-domain-gap](https://github.com/OltanS/event-camera-domain-gap).
+
 See https://sites.google.com/view/davis-driving-dataset-2020/home for details.
 
 ![view.py](ddd20-view.gif)
